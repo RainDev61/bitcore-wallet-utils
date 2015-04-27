@@ -12,14 +12,14 @@
     "utils"
   ],
   "repository": {
-    "url": "git@github.com:bitpay/bitcore-wallet-utils.git",
+    "url": "git@github.com:startcoin-project/bitcore-wallet-utils.git",
     "type": "git"
   },
   "bugs": {
-    "url": "https://github.com/bitpay/bitcore-wallet-utils/issues"
+    "url": "https://github.com/startcoin-project/bitcore-wallet-utils/issues"
   },
   "dependencies": {
-    "bitcore": "^0.11.4",
+    "bitcore": "git://github.com/startcoin-project/bitcore.git#d36d6c00d77ef5ac998b6588e1671689b3b8658f",
     "coveralls": "^2.11.2",
     "lodash": "^3.3.1",
     "preconditions": "^1.0.8",
