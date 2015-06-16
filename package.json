@@ -19,7 +19,7 @@
     "url": "https://github.com/startcoin-project/bitcore-wallet-utils/issues"
   },
   "dependencies": {
-    "bitcore": "git://github.com/startcoin-project/bitcore.git#d36d6c00d77ef5ac998b6588e1671689b3b8658f",
+    "bitcore": "git://github.com/startcoin-project/bitcore.git",
     "coveralls": "^2.11.2",
     "lodash": "^3.3.1",
     "preconditions": "^1.0.8",
