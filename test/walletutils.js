@@ -144,6 +144,41 @@ describe('WalletUtils', function() {
     });
   });
 
+  describe('#getProposalHash', function() {
+    it('should compute hash for old style proposals', function() {
+      var hash = WalletUtils.getProposalHash('msj42CCGruhRsFrGATiUuh25dtxYtnpbTx', 1234, 'the message');
+      hash.should.equal('msj42CCGruhRsFrGATiUuh25dtxYtnpbTx|1234|the message|');
+    });
+    it('should compute hash for arbitrary proposal', function() {
+      var header1 = {
+        type: 'simple',
+        version: '1.0',
+        toAddress: 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx',
+        amount: 1234,
+        message: {
+          one: 'one',
+          two: 'two'
+        },
+      };
+
+      var header2 = {
+        toAddress: 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx',
+        type: 'simple',
+        version: '1.0',
+        message: {
+          two: 'two',
+          one: 'one'
+        },
+        amount: 1234,
+      };
+
+      var hash1 = WalletUtils.getProposalHash(header1);
+      var hash2 = WalletUtils.getProposalHash(header2);
+
+      hash1.should.equal(hash2);
+    });
+  });
+
   describe('#getNetworkFromXPubKey', function() {
     it('should check correctly', function() {
       var result;
@@ -249,22 +284,107 @@ describe('WalletUtils', function() {
         changeAddress: {
           address: changeAddress
         },
-        feePerKb: 15000,
         requiredSignatures: 1,
         outputOrder: [0, 1]
       };
+
+      txp.feePerKb = 100;
+      (function() {
+        WalletUtils.buildTx(txp);
+      }).should.throw('Illegal Argument');
+
+      txp.feePerKb = 15000;
       (function() {
         WalletUtils.buildTx(txp);
       }).should.throw('Illegal Argument');
 
       txp.feePerKb = 5000;
-
       var t = WalletUtils.buildTx(txp);
       var bitcoreError = t.getSerializationError({
         disableIsFullySigned: true,
       });
       should.not.exist(bitcoreError);
       t.getFee().should.equal(5000);
+    });
+
+    it('should protect from creating excessive fee', function() {
+      var hdPrivateKey = new Bitcore.HDPrivateKey('tprv8ZgxMBicQKsPdPLE72pfSo7CvzTsWddGHdwSuMNrcerr8yQZKdaPXiRtP9Ew8ueSe9M7jS6RJsp4DiAVS2xmyxcCC9kZV6X1FMsX7EQX2R5');
+      var derivedPrivateKey = hdPrivateKey.derive(WalletUtils.PATHS.BASE_ADDRESS_DERIVATION);
+
+      var toAddress = 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx';
+      var changeAddress = 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx';
+
+      var publicKeyRing = [{
+        xPubKey: new Bitcore.HDPublicKey(derivedPrivateKey)
+      }];
+
+      var utxos = helpers.generateUtxos(publicKeyRing, 'm/1/0', 1, [1, 2]);
+      var txp = {
+        inputs: utxos,
+        toAddress: toAddress,
+        amount: 1.2,
+        changeAddress: {
+          address: changeAddress
+        },
+        requiredSignatures: 1,
+        outputOrder: [0, 1]
+      };
+
+
+      var x = WalletUtils.newBitcoreTransaction;
+
+      WalletUtils.newBitcoreTransaction = function() {
+        return {
+          from: sinon.stub(),
+          to: sinon.stub(),
+          change: sinon.stub(),
+          outputs: [{
+            satoshis: 1000,
+          }],
+        }
+      };
+
+      (function() {
+        var t = WalletUtils.buildTx(txp);
+      }).should.throw('Illegal State');
+
+      WalletUtils.newBitcoreTransaction = x;
+    });
+    it('should build a tx with multiple outputs', function() {
+      var hdPrivateKey = new Bitcore.HDPrivateKey('tprv8ZgxMBicQKsPdPLE72pfSo7CvzTsWddGHdwSuMNrcerr8yQZKdaPXiRtP9Ew8ueSe9M7jS6RJsp4DiAVS2xmyxcCC9kZV6X1FMsX7EQX2R5');
+      var derivedPrivateKey = hdPrivateKey.derive(WalletUtils.PATHS.BASE_ADDRESS_DERIVATION);
+
+      var toAddress = 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx';
+      var changeAddress = 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx';
+
+      var publicKeyRing = [{
+        xPubKey: new Bitcore.HDPublicKey(derivedPrivateKey)
+      }];
+
+      var utxos = helpers.generateUtxos(publicKeyRing, 'm/1/0', 1, [1000, 2000]);
+      var txp = {
+        inputs: utxos,
+        type: 'multiple_outputs',
+        outputs: [{
+          toAddress: toAddress,
+          amount: 800,
+          message: 'first output'
+        }, {
+          toAddress: toAddress,
+          amount: 900,
+          message: 'second output'
+        }],
+        changeAddress: {
+          address: changeAddress
+        },
+        requiredSignatures: 1,
+        outputOrder: [0, 1, 2]
+      };
+      var t = WalletUtils.buildTx(txp);
+      var bitcoreError = t.getSerializationError({
+        disableIsFullySigned: true,
+      });
+      should.not.exist(bitcoreError);
     });
   });
 
@@ -295,6 +415,40 @@ describe('WalletUtils', function() {
       var signatures = WalletUtils.signTxp(txp, hdPrivateKey);
       signatures.length.should.be.equal(utxos.length);
     });
+    it('should sign multiple-outputs proposal correctly', function() {
+      var hdPrivateKey = new Bitcore.HDPrivateKey('tprv8ZgxMBicQKsPdPLE72pfSo7CvzTsWddGHdwSuMNrcerr8yQZKdaPXiRtP9Ew8ueSe9M7jS6RJsp4DiAVS2xmyxcCC9kZV6X1FMsX7EQX2R5');
+      var derivedPrivateKey = hdPrivateKey.derive(WalletUtils.PATHS.BASE_ADDRESS_DERIVATION);
+
+      var toAddress = 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx';
+      var changeAddress = 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx';
+
+      var publicKeyRing = [{
+        xPubKey: new Bitcore.HDPublicKey(derivedPrivateKey)
+      }];
+
+      var path = 'm/1/0';
+      var utxos = helpers.generateUtxos(publicKeyRing, path, 1, [1000, 2000]);
+      var txp = {
+        inputs: utxos,
+        type: 'multiple_outputs',
+        outputs: [{
+          toAddress: toAddress,
+          amount: 800,
+          message: 'first output'
+        }, {
+          toAddress: toAddress,
+          amount: 900,
+          message: 'second output'
+        }],
+        changeAddress: {
+          address: changeAddress
+        },
+        requiredSignatures: 1,
+        outputOrder: [0, 1, 2]
+      };
+      var signatures = WalletUtils.signTxp(txp, hdPrivateKey);
+      signatures.length.should.be.equal(utxos.length);
+    });
   });
 
   describe('#formatAmount', function() {
@@ -304,7 +458,7 @@ describe('WalletUtils', function() {
         expected: '0',
       }, {
         args: [1, 'btc'],
-        expected: '0.000000',
+        expected: '0.00',
       }, {
         args: [0, 'bit'],
         expected: '0',
@@ -318,8 +472,14 @@ describe('WalletUtils', function() {
         args: [12345611, 'btc'],
         expected: '0.123456',
       }, {
+        args: [1234, 'btc'],
+        expected: '0.000012',
+      }, {
+        args: [1299, 'btc'],
+        expected: '0.000013',
+      }, {
         args: [1234567899999, 'btc'],
-        expected: '12,345.679000',
+        expected: '12,345.679',
       }, {
         args: [12345678, 'bit', {
           thousandsSeparator: '.'
@@ -335,7 +495,7 @@ describe('WalletUtils', function() {
           thousandsSeparator: ' ',
           decimalSeparator: ','
         }],
-        expected: '12 345,679000',
+        expected: '12 345,679',
       }, ];
 
       _.each(cases, function(testCase) {
