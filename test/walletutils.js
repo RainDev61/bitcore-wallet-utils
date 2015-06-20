@@ -146,14 +146,14 @@ describe('WalletUtils', function() {
 
   describe('#getProposalHash', function() {
     it('should compute hash for old style proposals', function() {
-      var hash = WalletUtils.getProposalHash('msj42CCGruhRsFrGATiUuh25dtxYtnpbTx', 1234, 'the message');
-      hash.should.equal('msj42CCGruhRsFrGATiUuh25dtxYtnpbTx|1234|the message|');
+      var hash = WalletUtils.getProposalHash('3Q7DLeQQNLVzMKRGctt1WHdR5nbp6gijxv', 1234, 'the message');
+      hash.should.equal('3Q7DLeQQNLVzMKRGctt1WHdR5nbp6gijxv|1234|the message|');
     });
     it('should compute hash for arbitrary proposal', function() {
       var header1 = {
         type: 'simple',
         version: '1.0',
-        toAddress: 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx',
+        toAddress: '3Q7DLeQQNLVzMKRGctt1WHdR5nbp6gijxv',
         amount: 1234,
         message: {
           one: 'one',
@@ -162,7 +162,7 @@ describe('WalletUtils', function() {
       };
 
       var header2 = {
-        toAddress: 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx',
+        toAddress: '3Q7DLeQQNLVzMKRGctt1WHdR5nbp6gijxv',
         type: 'simple',
         version: '1.0',
         message: {
@@ -237,11 +237,11 @@ describe('WalletUtils', function() {
 
   describe('#buildTx', function() {
     it('should build a tx correctly', function() {
-      var hdPrivateKey = new Bitcore.HDPrivateKey('tprv8ZgxMBicQKsPdPLE72pfSo7CvzTsWddGHdwSuMNrcerr8yQZKdaPXiRtP9Ew8ueSe9M7jS6RJsp4DiAVS2xmyxcCC9kZV6X1FMsX7EQX2R5');
+      var hdPrivateKey = new Bitcore.HDPrivateKey('xprv9s21ZrQH143K24vb1YqdkxQ3iL3msihGedQtLCpHa5mgtTbvNGCW1N8agNt4BA33GVAUMFEZQyusqw8YTs1gN6xtZuSnFcKDSKckG7j6fNG');
       var derivedPrivateKey = hdPrivateKey.derive(WalletUtils.PATHS.BASE_ADDRESS_DERIVATION);
 
-      var toAddress = 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx';
-      var changeAddress = 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx';
+      var toAddress = '3Q7DLeQQNLVzMKRGctt1WHdR5nbp6gijxv';
+      var changeAddress = '3ANkNpyjvg6tMJu9miJNFop6LhHTzQfZHG';
 
       var publicKeyRing = [{
         xPubKey: new Bitcore.HDPublicKey(derivedPrivateKey)
@@ -266,11 +266,11 @@ describe('WalletUtils', function() {
       t.getFee().should.equal(10000);
     });
     it('should build a tx with custom fee per kb', function() {
-      var hdPrivateKey = new Bitcore.HDPrivateKey('tprv8ZgxMBicQKsPdPLE72pfSo7CvzTsWddGHdwSuMNrcerr8yQZKdaPXiRtP9Ew8ueSe9M7jS6RJsp4DiAVS2xmyxcCC9kZV6X1FMsX7EQX2R5');
+      var hdPrivateKey = new Bitcore.HDPrivateKey('xprv9s21ZrQH143K24vb1YqdkxQ3iL3msihGedQtLCpHa5mgtTbvNGCW1N8agNt4BA33GVAUMFEZQyusqw8YTs1gN6xtZuSnFcKDSKckG7j6fNG');
       var derivedPrivateKey = hdPrivateKey.derive(WalletUtils.PATHS.BASE_ADDRESS_DERIVATION);
 
-      var toAddress = 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx';
-      var changeAddress = 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx';
+      var toAddress = '3Q7DLeQQNLVzMKRGctt1WHdR5nbp6gijxv';
+      var changeAddress = '39Nma9A9z32K37FBwMzyJw2Af6YscCwgwn';
 
       var publicKeyRing = [{
         xPubKey: new Bitcore.HDPublicKey(derivedPrivateKey)
@@ -308,11 +308,11 @@ describe('WalletUtils', function() {
     });
 
     it('should protect from creating excessive fee', function() {
-      var hdPrivateKey = new Bitcore.HDPrivateKey('tprv8ZgxMBicQKsPdPLE72pfSo7CvzTsWddGHdwSuMNrcerr8yQZKdaPXiRtP9Ew8ueSe9M7jS6RJsp4DiAVS2xmyxcCC9kZV6X1FMsX7EQX2R5');
+      var hdPrivateKey = new Bitcore.HDPrivateKey('xprv9s21ZrQH143K24vb1YqdkxQ3iL3msihGedQtLCpHa5mgtTbvNGCW1N8agNt4BA33GVAUMFEZQyusqw8YTs1gN6xtZuSnFcKDSKckG7j6fNG');
       var derivedPrivateKey = hdPrivateKey.derive(WalletUtils.PATHS.BASE_ADDRESS_DERIVATION);
 
-      var toAddress = 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx';
-      var changeAddress = 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx';
+      var toAddress = '3Q7DLeQQNLVzMKRGctt1WHdR5nbp6gijxv';
+      var changeAddress = '39Nma9A9z32K37FBwMzyJw2Af6YscCwgwn';
 
       var publicKeyRing = [{
         xPubKey: new Bitcore.HDPublicKey(derivedPrivateKey)
@@ -351,11 +351,11 @@ describe('WalletUtils', function() {
       WalletUtils.newBitcoreTransaction = x;
     });
     it('should build a tx with multiple outputs', function() {
-      var hdPrivateKey = new Bitcore.HDPrivateKey('tprv8ZgxMBicQKsPdPLE72pfSo7CvzTsWddGHdwSuMNrcerr8yQZKdaPXiRtP9Ew8ueSe9M7jS6RJsp4DiAVS2xmyxcCC9kZV6X1FMsX7EQX2R5');
+      var hdPrivateKey = new Bitcore.HDPrivateKey('xprv9s21ZrQH143K24vb1YqdkxQ3iL3msihGedQtLCpHa5mgtTbvNGCW1N8agNt4BA33GVAUMFEZQyusqw8YTs1gN6xtZuSnFcKDSKckG7j6fNG');
       var derivedPrivateKey = hdPrivateKey.derive(WalletUtils.PATHS.BASE_ADDRESS_DERIVATION);
 
-      var toAddress = 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx';
-      var changeAddress = 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx';
+      var toAddress = '3Q7DLeQQNLVzMKRGctt1WHdR5nbp6gijxv';
+      var changeAddress = '39Nma9A9z32K37FBwMzyJw2Af6YscCwgwn';
 
       var publicKeyRing = [{
         xPubKey: new Bitcore.HDPublicKey(derivedPrivateKey)
@@ -390,11 +390,11 @@ describe('WalletUtils', function() {
 
   describe('#signTxp', function() {
     it('should sign correctly', function() {
-      var hdPrivateKey = new Bitcore.HDPrivateKey('tprv8ZgxMBicQKsPdPLE72pfSo7CvzTsWddGHdwSuMNrcerr8yQZKdaPXiRtP9Ew8ueSe9M7jS6RJsp4DiAVS2xmyxcCC9kZV6X1FMsX7EQX2R5');
+      var hdPrivateKey = new Bitcore.HDPrivateKey('xprv9s21ZrQH143K24vb1YqdkxQ3iL3msihGedQtLCpHa5mgtTbvNGCW1N8agNt4BA33GVAUMFEZQyusqw8YTs1gN6xtZuSnFcKDSKckG7j6fNG');
       var derivedPrivateKey = hdPrivateKey.derive(WalletUtils.PATHS.BASE_ADDRESS_DERIVATION);
 
-      var toAddress = 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx';
-      var changeAddress = 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx';
+      var toAddress = '3Q7DLeQQNLVzMKRGctt1WHdR5nbp6gijxv';
+      var changeAddress = '39Nma9A9z32K37FBwMzyJw2Af6YscCwgwn';
 
       var publicKeyRing = [{
         xPubKey: new Bitcore.HDPublicKey(derivedPrivateKey)
@@ -416,11 +416,11 @@ describe('WalletUtils', function() {
       signatures.length.should.be.equal(utxos.length);
     });
     it('should sign multiple-outputs proposal correctly', function() {
-      var hdPrivateKey = new Bitcore.HDPrivateKey('tprv8ZgxMBicQKsPdPLE72pfSo7CvzTsWddGHdwSuMNrcerr8yQZKdaPXiRtP9Ew8ueSe9M7jS6RJsp4DiAVS2xmyxcCC9kZV6X1FMsX7EQX2R5');
+      var hdPrivateKey = new Bitcore.HDPrivateKey('xprv9s21ZrQH143K24vb1YqdkxQ3iL3msihGedQtLCpHa5mgtTbvNGCW1N8agNt4BA33GVAUMFEZQyusqw8YTs1gN6xtZuSnFcKDSKckG7j6fNG');
       var derivedPrivateKey = hdPrivateKey.derive(WalletUtils.PATHS.BASE_ADDRESS_DERIVATION);
 
-      var toAddress = 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx';
-      var changeAddress = 'msj42CCGruhRsFrGATiUuh25dtxYtnpbTx';
+      var toAddress = '3Q7DLeQQNLVzMKRGctt1WHdR5nbp6gijxv';
+      var changeAddress = '39Nma9A9z32K37FBwMzyJw2Af6YscCwgwn';
 
       var publicKeyRing = [{
         xPubKey: new Bitcore.HDPublicKey(derivedPrivateKey)
