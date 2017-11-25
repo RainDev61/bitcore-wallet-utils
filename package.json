@@ -12,14 +12,14 @@
     "utils"
   ],
   "repository": {
-    "url": "git@github.com:startcoin-project/bitcore-wallet-utils.git",
+    "url": "git@github.com:RainDev61/bitcore-wallet-utils.git",
     "type": "git"
   },
   "bugs": {
-    "url": "https://github.com/startcoin-project/bitcore-wallet-utils/issues"
+    "url": "https://github.com/RainDev61/bitcore-wallet-utils/issues"
   },
   "dependencies": {
-    "bitcore": "git://github.com/startcoin-project/bitcore.git",
+    "bitcore": "git://github.com/RainDev61/bitcore.git",
     "coveralls": "^2.11.2",
     "json-stable-stringify": "^1.0.0",
     "lodash": "^3.3.1",
